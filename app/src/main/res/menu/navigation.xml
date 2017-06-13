@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home"
+        android:title="Inicio" />
+
+    <item
+        android:id="@+id/navigation_running"
+        android:icon="@drawable/ic_directions_car"
+        android:title="Conductor" />
+
+    <item
+        android:id="@+id/navigation_ride"
+        android:icon="@drawable/ic_transfer_within_a_station"
+        android:title="Aventon" />
+
+    <item
+        android:id="@+id/navigation_list"
+        android:icon="@drawable/ic_view_list"
+        android:title="Viajes" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Más" />
+
+</menu>
