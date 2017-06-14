@@ -106,9 +106,10 @@ public class MainActivity extends AppCompatActivity {
         ft.replace(R.id.content, fragment, "fragment");
         // Start the animated transition.
         ft.commit();*/
-
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        Config.replaceFragmentWithAnimation(fragment, "fragment", transaction);
+        if(fragment != null){
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            Config.replaceFragmentWithAnimation(fragment, "fragment", transaction);
+        }
     }
 
 

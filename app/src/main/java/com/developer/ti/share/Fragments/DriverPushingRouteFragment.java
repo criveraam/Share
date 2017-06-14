@@ -10,13 +10,17 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -53,7 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCallback, DirectionFinderListener{
+public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCallback, DirectionFinderListener, View.OnClickListener{
     private static final String TAG = DriverPushingRouteFragment.class.getSimpleName();
     private static final String ARG_PARAM1 = "origin";
     private static final String ARG_PARAM2 = "destination";
@@ -110,33 +114,16 @@ public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCa
         _tvDestinationAddress = (TextView) rootView.findViewById(R.id.text_view_destination_address);
         _btnConfirmRoute = (Button) rootView.findViewById(R.id.button_confirm_routes);
 
-        _btnConfirmRoute.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                /*Fragment f = null;
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                f = new ConfirmRouteFragment();
-                fragmentManager.beginTransaction().replace(R.id.content, f).commit();*/
-
-                Fragment f = new ConfirmRouteFragment();
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                Config.replaceFragmentWithAnimation(f, "fragment", transaction);
-            }
-        });
-
-
-        if (getArguments() != null) {
-            _tvOriginOrigin.setText("Origen");
-            _tvOriginAddress.setText(getArguments().getString(ARG_PARAM1));
-            _tvDestinationOrigin.setText("Destino");
-            _tvDestinationAddress.setText(getArguments().getString(ARG_PARAM2));
-        }
+        _btnConfirmRoute.setOnClickListener(this);
 
         try {
             new DirectionFinder(this,getArguments().getString(ARG_PARAM1), getArguments().getString(ARG_PARAM2)).execute();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        arguments();
+        setToolbarTitle();
 
 
     }
@@ -197,21 +184,8 @@ public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCa
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
-
-        mGoogleMap = googleMap;
-
         LatLng hcmus = new LatLng(gps.getLatitude(), gps.getLongitude());
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(hcmus, 18));
-
-
-        /*Marker marker = mGoogleMap.addMarker(new MarkerOptions()
-                .position(hcmus)
-                .title("Origen")
-                //.icon(BitmapDescriptorFactory.fromResource(R.drawable.puntoa))
-                .snippet("FROM")
-        );*/
-
-        //marker.showInfoWindow();*/
         mGoogleMap.setBuildingsEnabled(true);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -225,13 +199,7 @@ public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCa
             return;
         }
         mGoogleMap.setMyLocationEnabled(true);
-
         mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
-
-
-
-
-
     }
 
     public void send(boolean peticion, String newUrl) {
@@ -314,15 +282,12 @@ public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCa
 
     @Override
     public void onDirectionFinderSuccess(List<Route> route) {
-
         polylinePaths = new ArrayList<>();
         originMarkers = new ArrayList<>();
         destinationMarkers = new ArrayList<>();
 
         for (Route route1 : route) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route1.startLocation, 16));
-            //((TextView) findViewById(R.id.tvDuration)).setText(route.duration.text);
-            //((TextView) findViewById(R.id.tvDistance)).setText(route.distance.text);
 
             Marker marker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(route1.startLocation)
@@ -334,8 +299,6 @@ public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCa
                     .title(route1.startAddress)
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.puntoa))
                     .snippet("Origen")));
-
-
 
             Marker marker1 = mGoogleMap.addMarker(new MarkerOptions()
                     .title(route1.endAddress)
@@ -361,13 +324,12 @@ public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCa
 
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-                //the include method will calculate the min and max bound.
                 builder.include(marker.getPosition());
                 builder.include(marker1.getPosition());
                 LatLngBounds bounds = builder.build();
                 int width = getResources().getDisplayMetrics().widthPixels;
                 int height = getResources().getDisplayMetrics().heightPixels;
-                int padding = (int) (width * 0.15); // offset from edges of the map 10% of screen
+                int padding = (int) (width * 0.30); // offset from edges of the map 10% of screen
 
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
                 mGoogleMap.animateCamera(cu);
@@ -380,12 +342,42 @@ public class DriverPushingRouteFragment extends Fragment implements OnMapReadyCa
             }catch (Exception e){
                 e.printStackTrace();
             }
-
-
-
-
-
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+        switch (v.getId()){
+            case R.id.button_confirm_routes:
+                Config.replaceFragmentWithAnimation(Config.F_DRIVE_CONFIRM_ROUTE, "fragment", transaction);
+                break;
+            case R.id.image_view_back_navigation:
+                Config.replaceFragmentBackWithAnimation(Config.F_DRIVE_DESTINATION, "fragment", transaction);
+                break;
+        }
+    }
+
+    private void arguments(){
+        if (getArguments() != null) {
+            _tvOriginOrigin.setText("Origen");
+            _tvOriginAddress.setText(getArguments().getString(ARG_PARAM1));
+            _tvDestinationOrigin.setText("Destino");
+            _tvDestinationAddress.setText(getArguments().getString(ARG_PARAM2));
+        }
+    }
+
+    private void setToolbarTitle(){
+        TextView _titleTop;
+        ImageView _arrowBack;
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.top_title_center);
+        _titleTop = (TextView) actionBar.getCustomView().findViewById(R.id.text_view_title);
+        _arrowBack = (ImageView) actionBar.getCustomView().findViewById(R.id.image_view_back_navigation);
+        _titleTop.setText("Ruta TEST");
+        _arrowBack.setVisibility(View.VISIBLE);
+        _arrowBack.setOnClickListener(this);
     }
 
     public interface OnFragmentInteractionListener {

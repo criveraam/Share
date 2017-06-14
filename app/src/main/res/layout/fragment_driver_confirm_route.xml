@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.developer.ti.share.Fragments.ConfirmRouteFragment">
+    tools:context="com.developer.ti.share.Fragments.DriverConfirmRouteFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -138,6 +138,7 @@
         </ScrollView>
 
         <Button
+            android:id="@+id/button_confirm_route_validate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -146,8 +147,7 @@
             android:text="Confirmar ruta"
             android:textColor="@android:color/white"
             android:textAppearance="@style/Widget.Design.AppBarLayout"
-            android:textSize="17dp"
-            android:id="@+id/button1" />
+            android:textSize="17dp" />
 
     </RelativeLayout>
 

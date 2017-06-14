@@ -5,32 +5,34 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.developer.ti.share.Helper.Config;
 import com.developer.ti.share.R;
 
-
-public class HomeFragment extends Fragment implements View.OnClickListener{
+public class DriverConfirmRouteFragment extends Fragment implements View.OnClickListener{
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private String mParam1;
     private String mParam2;
     private OnFragmentInteractionListener mListener;
     private View rootView;
-    private Button _btnPushingRoute, _btnSearchRoute;
+    private Button _btnConfirmRoute;
 
-    public HomeFragment() {
+    public DriverConfirmRouteFragment() {
         // Required empty public constructor
     }
 
-
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
+    public static DriverConfirmRouteFragment newInstance(String param1, String param2) {
+        DriverConfirmRouteFragment fragment = new DriverConfirmRouteFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -50,23 +52,17 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         rootView = view;
-
-        _btnPushingRoute = (Button) rootView.findViewById(R.id.button_pushing_route);
-        _btnSearchRoute = (Button) rootView.findViewById(R.id.button_search_route);
-
-        _btnPushingRoute.setOnClickListener(this);
-        _btnSearchRoute.setOnClickListener(this);
+        _btnConfirmRoute = (Button) rootView.findViewById(R.id.button_confirm_route_validate);
+        _btnConfirmRoute.setOnClickListener(this);
+        setToolbarTitle();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_driver_confirm_route, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
@@ -89,23 +85,33 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        Fragment f = null;
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
         switch (v.getId()){
-            case R.id.button_pushing_route:
-                f = Config.F_DRIVE_ORIGIN;
+            case R.id.button_confirm_route_validate:
+                Config.replaceFragmentWithAnimation(Config.F_HOME, "fragment", transaction);
                 break;
-            case R.id.button_search_route:
-                //f = new DriverPushingRouteFragment();
+            case R.id.image_view_back_navigation:
+                Config.replaceFragmentBackWithAnimation(Config.F_DRIVE_PUSHING, "fragmento", transaction);
                 break;
-        }
-        if(f != null){
-            fragmentManager.beginTransaction().replace(R.id.content, f).commit();
         }
     }
 
+    private void arguments(){}
+
+    private void setToolbarTitle(){
+        TextView _titleTop;
+        ImageView _arrowBack;
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.top_title_center);
+        _titleTop = (TextView) actionBar.getCustomView().findViewById(R.id.text_view_title);
+        _arrowBack = (ImageView) actionBar.getCustomView().findViewById(R.id.image_view_back_navigation);
+        _titleTop.setText("Confirmar Ruta");
+        _arrowBack.setVisibility(View.VISIBLE);
+        _arrowBack.setOnClickListener(this);
+    }
+
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 }

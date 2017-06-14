@@ -89,6 +89,7 @@ public class DriverDestinationaFragment extends Fragment implements OnMapReadyCa
             mParam2 = getArguments().getString(ARG_PARAM2);
             mParam3 = getArguments().getString(ARG_PARAM3);
             mParam4 = getArguments().getString(ARG_PARAM4);
+            Log.e(TAG, "Argumentos --> " + getArguments());
         }
     }
 
@@ -105,20 +106,11 @@ public class DriverDestinationaFragment extends Fragment implements OnMapReadyCa
         _btnConfirmRoute = (Button) rootView.findViewById(R.id.button_confirm_route);
 
         arguments();
+        setToolbarTitle();
 
         _btnConfirmRoute.setOnClickListener(this);
 
-        TextView _titleTop;
-        ImageView _arrowBack;
-        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setCustomView(R.layout.top_title_center);
-        _titleTop = (TextView) actionBar.getCustomView().findViewById(R.id.text_view_title);
-        _arrowBack = (ImageView) actionBar.getCustomView().findViewById(R.id.image_view_back_navigation);
-        _titleTop.setText("Crear ruta");
-        _arrowBack.setVisibility(View.VISIBLE);
 
-        _arrowBack.setOnClickListener(this);
     }
 
     @Override
@@ -140,18 +132,15 @@ public class DriverDestinationaFragment extends Fragment implements OnMapReadyCa
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.button_confirm_route:
-                Fragment f = new DriverPushingRouteFragment();
                 MainActivity m = (MainActivity) getContext();
-
                 String origin = _tvOriginAddress.getText().toString();
                 String destination = _tvDestinationAddress.getText().toString();
-                m.params(f, "", "", "", "", origin, destination);
+                m.params(Config.F_DRIVE_PUSHING, "", "", "", "", origin, destination);
                 break;
 
             case R.id.image_view_back_navigation:
-                Fragment f1 = new DriverOriginFragment();
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                Config.replaceFragmentWithAnimation(f1, "fragment", transaction);
+                Config.replaceFragmentBackWithAnimation(Config.F_DRIVE_ORIGIN, "fragment", transaction);
                 break;
         }
     }
@@ -313,7 +302,19 @@ public class DriverDestinationaFragment extends Fragment implements OnMapReadyCa
         if(getArguments() != null){
             _tvOriginAddress.setText(getArguments().getString(ARG_PARAM1));
             _tvOriginLocation.setText(getArguments().getString(ARG_PARAM2));
-
         }
+    }
+
+    private void setToolbarTitle(){
+        TextView _titleTop;
+        ImageView _arrowBack;
+        ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.top_title_center);
+        _titleTop = (TextView) actionBar.getCustomView().findViewById(R.id.text_view_title);
+        _arrowBack = (ImageView) actionBar.getCustomView().findViewById(R.id.image_view_back_navigation);
+        _titleTop.setText("Crear ruta");
+        _arrowBack.setVisibility(View.VISIBLE);
+        _arrowBack.setOnClickListener(this);
     }
 }
